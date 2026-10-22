@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}E-Cycle — About Project{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="container">
+    <h1 class="section-title">About the Project</h1>
+    <p class="section-sub">E-Cycle — Smart E-Waste Management System</p>
+
+    <div class="card mb-16">
+      <h3>Problem Statement</h3>
+      <p>Electronic waste is one of the fastest-growing waste streams. Most people throw old electronics into ordinary household waste, where hazardous materials leak into the environment and valuable resources are lost. There is a need for a simple system that helps people dispose of e-waste responsibly.</p>
+    </div>
+
+    <div class="card mb-16">
+      <h3>Project Objectives</h3>
+      <ul>
+        <li>Provide an easy way to submit e-waste collection requests.</li>
+        <li>Automatically segregate items into reusable, repairable, recyclable, and special-handling categories.</li>
+        <li>Promote reuse, repair, and responsible recycling over disposal.</li>
+        <li>Demonstrate the circular economy in a working prototype.</li>
+      </ul>
+    </div>
+
+    <div class="card mb-16">
+      <h3>Proposed Solution</h3>
+      <p>E-Cycle is a web application where users submit details of their old electronics. A rule-based engine classifies each item and recommends the right handling path. Administrators can track requests, update their status, and export data.</p>
+    </div>
+
+    <div class="card mb-16">
+      <h3>Technologies Used</h3>
+      <ul>
+        <li>Frontend: HTML5, CSS3, JavaScript, Chart.js, Font Awesome</li>
+        <li>Backend: Python with Flask</li>
+        <li>Database: SQLite</li>
+      </ul>
+    </div>
+
+    <div class="card mb-16">
+      <h3>Innovation &amp; Circular Economy Contribution</h3>
+      <p>The project applies the circular economy principle — Reduce → Reuse → Repair → Refurbish → Recycle → Recover Materials — by extending the life of electronics and directing unusable items to authorised recyclers instead of landfills.</p>
+    </div>
+
+    <div class="card mb-16">
+      <h3>Future Scope</h3>
+      <ul>
+        <li>Pickup scheduling and route optimisation</li>
+        <li>Partnerships with authorised recyclers</li>
+        <li>Image-based classification of e-waste</li>
+        <li>Map integration for collection points</li>
+        <li>Machine learning for smarter segregation</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Group Members</h3>
+      <p class="muted">Edit this section with your group members' names and PRNs.</p>
+      <table>
+        <thead><tr><th>Name</th><th>PRN</th></tr></thead>
+        <tbody>
+          <tr><td>Member 1</td><td>PRN-0001</td></tr>
+          <tr><td>Member 2</td><td>PRN-0002</td></tr>
+          <tr><td>Member 3</td><td>PRN-0003</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+{% endblock %}

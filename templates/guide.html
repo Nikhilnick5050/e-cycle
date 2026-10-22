@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}E-Cycle — Segregation Guide{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="container">
+    <h1 class="section-title">Segregation Guide</h1>
+    <p class="section-sub">Learn how different types of e-waste should be handled safely and responsibly.</p>
+
+    <div class="principle mb-16">
+      Reduce unnecessary electronic purchases → Reuse → Repair → Refurbish → Recycle → Recover Materials
+    </div>
+
+    <div class="warning-box mb-16">
+      <strong><i class="fa-solid fa-triangle-exclamation"></i> Safety warning:</strong>
+      Never burn e-waste or dismantle batteries and electronic devices at home. Burning releases toxic fumes, and opening batteries can cause fires, leaks, or injury.
+    </div>
+
+    <div class="card-grid cols-2">
+      <div class="card guide-card">
+        <h3><i class="fa-solid fa-hand-holding-heart"></i> Reusable Items</h3>
+        <p><strong>Recommended action:</strong> Reuse, donate, or refurbish.</p>
+        <p><strong>Examples:</strong> Working phones, laptops, tablets, desktops.</p>
+        <p><strong>Precautions:</strong> Wipe personal data before donating. If no longer needed, hand to an authorised collection point.</p>
+      </div>
+      <div class="card guide-card">
+        <h3><i class="fa-solid fa-screwdriver-wrench"></i> Repairable Items</h3>
+        <p><strong>Recommended action:</strong> Professional repair first.</p>
+        <p><strong>Examples:</strong> Devices with minor faults — cracked screens, faulty batteries, loose ports.</p>
+        <p><strong>Precautions:</strong> Use qualified repair services. If repair is impractical, send to authorised recycling.</p>
+      </div>
+      <div class="card guide-card">
+        <h3><i class="fa-solid fa-recycle"></i> Recyclable Items</h3>
+        <p><strong>Recommended action:</strong> Authorised recycling for material recovery.</p>
+        <p><strong>Examples:</strong> Damaged devices, chargers, cables, TVs, monitors.</p>
+        <p><strong>Precautions:</strong> Handle carefully; never break or burn. Deliver to an authorised e-waste facility.</p>
+      </div>
+      <div class="card guide-card" style="border-left-color:var(--danger);">
+        <h3><i class="fa-solid fa-battery-quarter"></i> Special Handling</h3>
+        <p><strong>Recommended action:</strong> Always separate batteries.</p>
+        <p><strong>Examples:</strong> All batteries — phone, laptop, button cells, power banks.</p>
+        <p><strong>Precautions:</strong> Never open, crush, burn, or throw in household waste. Store cool and dry, then take to an authorised battery collection point.</p>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

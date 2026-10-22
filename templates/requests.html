@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+{% block title %}E-Cycle — Collection Requests{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="container">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+      <h1 style="margin:0;">Collection Requests</h1>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <a href="/export.csv" class="btn btn-primary btn-sm" id="exportBtn"><i class="fa-solid fa-file-csv"></i> Export CSV</a>
+        {% if session.get('is_admin') %}
+          <a href="{{ url_for('logout') }}" class="btn btn-danger btn-sm"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+        {% else %}
+          <a href="{{ url_for('login') }}" class="btn btn-light btn-sm" style="color:var(--green-dark);border:1px solid var(--grey-300);"><i class="fa-solid fa-lock"></i> Admin Login</a>
+        {% endif %}
+      </div>
+    </div>
+    <p class="muted mb-16">Search, filter, and manage all submitted requests.</p>
+
+    <div class="filters">
+      <input type="text" id="searchInput" placeholder="Search by Request ID or Name">
+      <select id="filterType">
+        <option value="">All Item Types</option>
+        {% for t in item_types %}<option value="{{ t }}">{{ t }}</option>{% endfor %}
+      </select>
+      <select id="filterCondition">
+        <option value="">All Conditions</option>
+        {% for c in conditions %}<option value="{{ c }}">{{ c }}</option>{% endfor %}
+      </select>
+      <select id="filterStatus">
+        <option value="">All Statuses</option>
+        {% for s in statuses %}<option value="{{ s }}">{{ s }}</option>{% endfor %}
+      </select>
+      <select id="sortSelect">
+        <option value="newest">Newest First</option>
+        <option value="oldest">Oldest First</option>
+      </select>
+    </div>
+
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Request ID</th><th>Date</th><th>Name</th><th>Contact</th><th>Location</th>
+              <th>Item</th><th>Condition</th><th>Qty</th><th>Recommended Action</th><th>Status</th>
+              {% if session.get('is_admin') %}<th>Actions</th>{% endif %}
+            </tr>
+          </thead>
+          <tbody id="requestsBody">
+            <tr><td colspan="11" class="empty"><i class="fa-solid fa-inbox"></i><br>Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Detail modal -->
+<div class="hidden" id="detailModal" style="position:fixed;inset:0;background:rgba(0,0,0,0.4);display:none;align-items:center;justify-content:center;z-index:100;padding:16px;">
+  <div class="card" style="max-width:560px;width:100%;max-height:90vh;overflow:auto;">
+    <h3 style="margin-top:0;">Request Details</h3>
+    <div id="detailContent"></div>
+    <button class="btn btn-light mt-16" style="color:var(--green-dark);border:1px solid var(--grey-300);" onclick="closeDetail()">Close</button>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const isAdmin = {{ 'true' if session.get('is_admin') else 'false' }};
+
+function badge(status) {
+  const cls = status === 'Pending' ? 'badge-pending' : status === 'Collected' ? 'badge-collected' : 'badge-completed';
+  return `<span class="badge ${cls}">${status}</span>`;
+}
+
+function catBadge(cat) {
+  const map = { 'Reusable':'badge-reusable', 'Repairable':'badge-repairable', 'Recyclable':'badge-recyclable', 'Special Handling':'badge-special' };
+  return `<span class="badge ${map[cat] || 'badge-recyclable'}">${cat}</span>`;
+}
+
+function currentQuery() {
+  const p = new URLSearchParams();
+  const q = document.getElementById('searchInput').value.trim();
+  const t = document.getElementById('filterType').value;
+  const c = document.getElementById('filterCondition').value;
+  const s = document.getElementById('filterStatus').value;
+  const sort = document.getElementById('sortSelect').value;
+  if (q) p.set('q', q);
+  if (t) p.set('item_type', t);
+  if (c) p.set('condition', c);
+  if (s) p.set('status', s);
+  p.set('sort', sort);
+  return p.toString();
+}
+
+async function loadRequests() {
+  const res = await fetch('/api/requests?' + currentQuery());
+  const d = await res.json();
+  const body = document.getElementById('requestsBody');
+  if (!d.requests.length) {
+    body.innerHTML = '<tr><td colspan="11" class="empty"><i class="fa-solid fa-inbox"></i><br>No requests found.</td></tr>';
+    return;
+  }
+  body.innerHTML = d.requests.map(r => `
+    <tr>
+      <td>${r.request_id}</td>
+      <td>${r.submitted_at}</td>
+      <td>${r.full_name}</td>
+      <td>${r.contact}</td>
+      <td>${r.pickup_location}</td>
+      <td>${r.item_type}</td>
+      <td>${r.condition}</td>
+      <td>${r.quantity}</td>
+      <td>${catBadge(r.category)}</td>
+      <td>${badge(r.status)}</td>
+      ${isAdmin ? `<td>
+        <button class="btn btn-sm btn-light" style="color:var(--green-dark);border:1px solid var(--grey-300);" onclick="showDetail(${r.id})"><i class="fa-solid fa-eye"></i></button>
+        <select onchange="updateStatus(${r.id}, this.value)" style="width:auto;padding:6px;font-size:0.8rem;">
+          <option value="Pending" ${r.status==='Pending'?'selected':''}>Pending</option>
+          <option value="Collected" ${r.status==='Collected'?'selected':''}>Collected</option>
+          <option value="Completed" ${r.status==='Completed'?'selected':''}>Completed</option>
+        </select>
+        <button class="btn btn-sm btn-danger" onclick="deleteRequest(${r.id})"><i class="fa-solid fa-trash"></i></button>
+      </td>` : `<td><button class="btn btn-sm btn-light" style="color:var(--green-dark);border:1px solid var(--grey-300);" onclick="showDetail(${r.id})"><i class="fa-solid fa-eye"></i></button></td>`}
+    </tr>
+  `).join('');
+}
+
+async function showDetail(id) {
+  const res = await fetch('/api/requests');
+  const d = await res.json();
+  const r = d.requests.find(x => x.id === id);
+  if (!r) return;
+  document.getElementById('detailContent').innerHTML = `
+    <p><strong>Request ID:</strong> ${r.request_id}</p>
+    <p><strong>Submitted:</strong> ${r.submitted_at}</p>
+    <p><strong>Name:</strong> ${r.full_name}</p>
+    <p><strong>Contact:</strong> ${r.contact}</p>
+    <p><strong>Pickup Location:</strong> ${r.pickup_location}</p>
+    <p><strong>Item:</strong> ${r.item_type}</p>
+    <p><strong>Condition:</strong> ${r.condition}</p>
+    <p><strong>Quantity:</strong> ${r.quantity}</p>
+    <p><strong>Category:</strong> ${catBadge(r.category)}</p>
+    <p><strong>Recommendation:</strong> ${r.recommendation}</p>
+    ${r.notes ? `<p><strong>Notes:</strong> ${r.notes}</p>` : ''}
+    <p><strong>Status:</strong> ${badge(r.status)}</p>
+  `;
+  document.getElementById('detailModal').style.display = 'flex';
+}
+
+function closeDetail() {
+  document.getElementById('detailModal').style.display = 'none';
+}
+
+async function updateStatus(id, status) {
+  const res = await fetch(`/api/requests/${id}/status`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ status })
+  });
+  if (res.ok) loadRequests();
+  else alert('Failed to update status.');
+}
+
+async function deleteRequest(id) {
+  if (!confirm('Are you sure you want to delete this request? This cannot be undone.')) return;
+  const res = await fetch(`/api/requests/${id}`, { method: 'DELETE' });
+  if (res.ok) loadRequests();
+  else alert('Failed to delete request.');
+}
+
+document.getElementById('searchInput').addEventListener('input', loadRequests);
+document.getElementById('filterType').addEventListener('change', loadRequests);
+document.getElementById('filterCondition').addEventListener('change', loadRequests);
+document.getElementById('filterStatus').addEventListener('change', loadRequests);
+document.getElementById('sortSelect').addEventListener('change', loadRequests);
+document.getElementById('exportBtn').addEventListener('click', (e) => {
+  e.preventDefault();
+  window.location.href = '/export.csv?' + currentQuery();
+});
+loadRequests();
+</script>
+{% endblock %}

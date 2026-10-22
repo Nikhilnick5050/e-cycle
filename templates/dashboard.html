@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% block title %}E-Cycle — Dashboard{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="container">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+      <h1 style="margin:0;">Dashboard</h1>
+      <button class="btn btn-primary btn-sm" id="refreshBtn"><i class="fa-solid fa-rotate"></i> Refresh</button>
+    </div>
+    <p class="muted mb-16">Live statistics calculated from stored collection requests.</p>
+
+    <div class="stats-grid" id="statsGrid">
+      <div class="card stat-card"><div class="value">—</div><div class="label">Total Requests</div></div>
+      <div class="card stat-card"><div class="value">—</div><div class="label">Total Items</div></div>
+      <div class="card stat-card"><div class="value">—</div><div class="label">Pending</div></div>
+      <div class="card stat-card"><div class="value">—</div><div class="label">Collected</div></div>
+      <div class="card stat-card"><div class="value">—</div><div class="label">Completed</div></div>
+      <div class="card stat-card"><div class="value">—</div><div class="label">Reusable Items</div></div>
+      <div class="card stat-card"><div class="value">—</div><div class="label">Repairable Items</div></div>
+      <div class="card stat-card"><div class="value">—</div><div class="label">Recyclable Items</div></div>
+    </div>
+
+    <div class="chart-row">
+      <div class="card">
+        <h3>Requests by Item Type</h3>
+        <div class="chart-box"><canvas id="typeChart"></canvas></div>
+      </div>
+      <div class="card">
+        <h3>Item Conditions</h3>
+        <div class="chart-box"><canvas id="conditionChart"></canvas></div>
+      </div>
+    </div>
+
+    <div class="card mt-24">
+      <h3>Recent Collection Requests</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Request ID</th><th>Date</th><th>Name</th><th>Item</th><th>Condition</th><th>Qty</th><th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="recentBody">
+            <tr><td colspan="7" class="empty"><i class="fa-solid fa-inbox"></i><br>No requests yet.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+let typeChart, conditionChart;
+
+function badge(status) {
+  const cls = status === 'Pending' ? 'badge-pending' : status === 'Collected' ? 'badge-collected' : 'badge-completed';
+  return `<span class="badge ${cls}">${status}</span>`;
+}
+
+async function loadStats() {
+  const res = await fetch('/api/stats');
+  const d = await res.json();
+  const grid = document.getElementById('statsGrid');
+  const values = [
+    d.total_requests, d.total_items, d.pending, d.collected,
+    d.completed, d.reusable, d.repairable, d.recyclable
+  ];
+  const labels = [
+    'Total Requests', 'Total Items', 'Pending', 'Collected',
+    'Completed', 'Reusable Items', 'Repairable Items', 'Recyclable Items'
+  ];
+  grid.innerHTML = values.map((v, i) =>
+    `<div class="card stat-card"><div class="value">${v}</div><div class="label">${labels[i]}</div></div>`
+  ).join('');
+
+  // Bar chart: requests by item type
+  const typeLabels = Object.keys(d.by_type);
+  const typeData = Object.values(d.by_type);
+  if (typeChart) typeChart.destroy();
+  typeChart = new Chart(document.getElementById('typeChart'), {
+    type: 'bar',
+    data: {
+      labels: typeLabels.length ? typeLabels : ['No data'],
+      datasets: [{ label: 'Requests', data: typeLabels.length ? typeData : [0], backgroundColor: '#66bb6a' }]
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+  });
+
+  // Doughnut chart: conditions
+  const condLabels = Object.keys(d.by_condition);
+  const condData = Object.values(d.by_condition);
+  if (conditionChart) conditionChart.destroy();
+  conditionChart = new Chart(document.getElementById('conditionChart'), {
+    type: 'doughnut',
+    data: {
+      labels: condLabels.length ? condLabels : ['No data'],
+      datasets: [{ data: condLabels.length ? condData : [1], backgroundColor: ['#66bb6a', '#f9a825', '#ef6c00'] }]
+    },
+    options: { responsive: true, maintainAspectRatio: false }
+  });
+
+  // Recent table
+  const body = document.getElementById('recentBody');
+  if (!d.recent.length) {
+    body.innerHTML = '<tr><td colspan="7" class="empty"><i class="fa-solid fa-inbox"></i><br>No requests yet.</td></tr>';
+  } else {
+    body.innerHTML = d.recent.map(r =>
+      `<tr>
+        <td>${r.request_id}</td>
+        <td>${r.submitted_at}</td>
+        <td>${r.full_name}</td>
+        <td>${r.item_type}</td>
+        <td>${r.condition}</td>
+        <td>${r.quantity}</td>
+        <td>${badge(r.status)}</td>
+      </tr>`
+    ).join('');
+  }
+}
+
+document.getElementById('refreshBtn').addEventListener('click', loadStats);
+loadStats();
+</script>
+{% endblock %}

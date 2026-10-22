@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}E-Cycle — Home{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="container">
+    <h1>Give Your E-Waste a Second Life</h1>
+    <p>E-Cycle helps you responsibly dispose of electronic waste through collection requests, smart segregation, reuse, repair, and recycling — keeping harmful materials out of ordinary household waste.</p>
+    <div class="btn-row">
+      <a href="{{ url_for('submit') }}" class="btn btn-light"><i class="fa-solid fa-box-open"></i> Submit E-Waste</a>
+      <a href="{{ url_for('guide') }}" class="btn btn-outline"><i class="fa-solid fa-book-open"></i> Explore Recycling Guide</a>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <h2 class="section-title">How E-Cycle Works</h2>
+    <p class="section-sub">Four simple steps that turn your old electronics into a resource instead of waste.</p>
+    <div class="card-grid cols-4">
+      <div class="card feature-card">
+        <div class="icon"><i class="fa-solid fa-truck"></i></div>
+        <h3>Collection</h3>
+        <p>Submit a pickup request for your old electronics in under a minute.</p>
+      </div>
+      <div class="card feature-card">
+        <div class="icon"><i class="fa-solid fa-filter"></i></div>
+        <h3>Segregation</h3>
+        <p>Our rule-based engine classifies each item for the right handling path.</p>
+      </div>
+      <div class="card feature-card">
+        <div class="icon"><i class="fa-solid fa-screwdriver-wrench"></i></div>
+        <h3>Reuse &amp; Repair</h3>
+        <p>Working and repairable items get a second life through reuse and refurbishment.</p>
+      </div>
+      <div class="card feature-card">
+        <div class="icon"><i class="fa-solid fa-recycle"></i></div>
+        <h3>Recycling</h3>
+        <p>Unusable items are directed to authorised recyclers for material recovery.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-alt">
+  <div class="container">
+    <h2 class="section-title">The Circular Economy Workflow</h2>
+    <p class="section-sub">Every device follows a path that keeps materials in use for as long as possible.</p>
+    <div class="workflow">
+      <span class="step">Collection</span><span class="arrow">→</span>
+      <span class="step">Segregation</span><span class="arrow">→</span>
+      <span class="step">Reuse / Repair</span><span class="arrow">→</span>
+      <span class="step">Recycling</span><span class="arrow">→</span>
+      <span class="step">Material Recovery</span>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <h2 class="section-title">Why Not the Household Bin?</h2>
+    <p class="section-sub">Electronic waste contains hazardous materials and valuable resources that ordinary waste systems cannot handle safely.</p>
+    <div class="card-grid cols-2">
+      <div class="card">
+        <h3><i class="fa-solid fa-triangle-exclamation" style="color:var(--danger)"></i> Hazardous Materials</h3>
+        <p>Devices contain lead, mercury, cadmium, and flame retardants. When dumped in landfills, these can leak into soil and groundwater.</p>
+      </div>
+      <div class="card">
+        <h3><i class="fa-solid fa-gem" style="color:var(--green)"></i> Valuable Resources</h3>
+        <p>Gold, silver, copper, and rare metals in electronics can be recovered and reused — reducing the need for new mining.</p>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
