@@ -8,8 +8,9 @@ All queries use parameterised statements to prevent SQL injection.
 import os
 import sqlite3
 
-# The database file lives next to this script.
-DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ecycle.db")
+# The database file lives next to this script by default.
+# On Render, set DB_PATH to the persistent disk (e.g. /var/data/ecycle.db).
+DB_PATH = os.environ.get("DB_PATH", os.path.join(os.path.dirname(os.path.abspath(__file__)), "ecycle.db"))
 
 
 def get_db():

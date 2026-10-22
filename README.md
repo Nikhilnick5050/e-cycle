@@ -60,12 +60,23 @@ static/style.css    # Global stylesheet
 
 ## Deployment
 
-For a simple online demo, deploy to a platform that supports Python/Flask, such as Render, Railway, or PythonAnywhere:
+### Option A — Render (recommended, free)
 
-1. Push the project to a Git repository.
-2. Create a new web service and set the start command to `python app.py` (or use a WSGI server like `gunicorn app:app`).
-3. Set the environment variable `SECRET_KEY` to a random secret value.
-4. Note: SQLite stores data in a local file, so on some free hosts the database resets on redeploy. For persistent production data, switch to a hosted database (e.g. PostgreSQL).
+Render gives Flask + SQLite a persistent disk, so your data survives restarts.
+
+1. Push this project to a GitHub repository.
+2. Go to [render.com](https://render.com) and sign in with GitHub.
+3. Click **New > Blueprint**, connect your repo, and Render will read `render.yaml` automatically.
+4. Render installs dependencies, starts the app with `gunicorn`, and gives you a public URL.
+5. The SQLite database is stored on a 1 GB persistent disk (`/var/data/ecycle.db`).
+
+### Option B — Railway or PythonAnywhere
+
+Any host that supports Python/Flask works. Set the start command to `gunicorn app:app` (or `python app.py`), and set `SECRET_KEY` to a random value.
+
+### Important note on SQLite
+
+SQLite stores data in a local file. On hosts without a persistent disk (e.g. Vercel serverless functions), the database resets on every request and the dashboard will appear empty. Use a host with a persistent disk (Render, Railway, PythonAnywhere) or switch to a hosted database (e.g. PostgreSQL) for production.
 
 ## Limitations (honest notes)
 

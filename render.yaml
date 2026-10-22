@@ -1,0 +1,19 @@
+# Render.com one-click deploy configuration for E-Cycle.
+# Push this repo to GitHub, then in Render choose "New > Blueprint"
+# and point it at this repository. Render reads this file automatically.
+services:
+  - type: web
+    name: e-cycle
+    runtime: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn app:app --bind 0.0.0.0:$PORT"
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DB_PATH
+        value: /var/data/ecycle.db
+    # Persistent disk so the SQLite database survives restarts and redeploys.
+    disk:
+      name: ecycle-data
+      mountPath: /var/data
+      sizeGB: 1

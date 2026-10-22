@@ -27,7 +27,8 @@ from werkzeug.security import check_password_hash, generate_password_hash
 # App configuration
 # ---------------------------------------------------------------------------
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.join(BASE_DIR, "ecycle.db")
+# On Render, DB_PATH points to the persistent disk (see render.yaml).
+DB_PATH = os.environ.get("DB_PATH", os.path.join(BASE_DIR, "ecycle.db"))
 
 app = Flask(__name__)
 # NOTE: In a real deployment, set this from an environment variable.
